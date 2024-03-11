@@ -1,22 +1,23 @@
 package tests;
 
 
+import io.qameta.allure.Owner;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
-import java.util.Collection;
 
 import static io.restassured.RestAssured.*;
 import static io.restassured.http.ContentType.JSON;
 import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasKey;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 
 public class ReqresLoginTest {
-
+    @Owner("iStarzG")
+    @Tag("Successful")
     @Test
-    void loginSuccessful() {
+    void loginSuccessfulWithCorrectValues() {
         String firstBody = "{\"email\": \"eve.holt@reqres.in\", \"password\": \"cityslicka\"}";
         given()
                 .log().uri()
@@ -34,6 +35,8 @@ public class ReqresLoginTest {
 
     }
 
+    @Owner("iStarzG")
+    @Tag("Negative")
     @Test
     void noContentJSONLoginTest() {
         String firstBody = "{\"email\": \"eve.holt@reqres.in\", \"password\": \"cityslicka\"}";
@@ -51,8 +54,10 @@ public class ReqresLoginTest {
                 .body("error", is("Missing email or username"));
     }
 
+    @Owner("iStarzG")
+    @Tag("Negative")
     @Test
-    void noValueLoginTest() {
+    void emptyValuesLoginTest() {
         String firstBody = "{}";
         given()
                 .log().uri()
@@ -68,6 +73,8 @@ public class ReqresLoginTest {
                 .body("error", is("Missing email or username"));
     }
 
+    @Owner("iStarzG")
+    @Tag("Negative")
     @Test
     void loginUnsuccessfulNoPassword() {
         String firstBody = "{\"email\": \"peter@klaven\"}";
@@ -88,9 +95,11 @@ public class ReqresLoginTest {
 
     }
 
+    @Owner("iStarzG")
+    @Tag("Successful")
     @Test
     void singleUserSuccessfulLoginWithSchema() {
-        given()
+        Response statusResponse = given()
                 .log().uri()
                 .log().method()
                 .log().body()
@@ -101,8 +110,11 @@ public class ReqresLoginTest {
                 .log().status()
                 .log().body()
                 .statusCode(200)
-                .body(matchesJsonSchemaInClasspath("schemas/schemaLoginsReqres"));
-
-
+                .body(matchesJsonSchemaInClasspath("schemas/schemaLoginsReqres"))
+                .extract().response();
+        assertThat(statusResponse.path("data.id"), is(2));
+        assertThat(statusResponse.path("data.email"), hasToString("janet.weaver@reqres.in"));
+        assertThat(statusResponse.path("data.first_name"), hasToString("Janet"));
+        assertThat(statusResponse.path("data.last_name"), hasToString("Weaver"));
     }
 }
