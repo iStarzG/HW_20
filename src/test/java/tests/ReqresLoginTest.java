@@ -14,6 +14,7 @@ import static io.restassured.http.ContentType.JSON;
 import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 public class ReqresLoginTest {
     @BeforeAll
@@ -21,6 +22,7 @@ public class ReqresLoginTest {
         RestAssured.baseURI = "https://reqres.in";
         RestAssured.basePath = "/api";
     }
+
     @Owner("iStarzG")
     @Tag("Successful")
     @Test
@@ -119,9 +121,29 @@ public class ReqresLoginTest {
                 .statusCode(200)
                 .body(matchesJsonSchemaInClasspath("schemas/schemaLoginsReqres"))
                 .extract().response();
-        assertThat(statusResponse.path("data.id"), is(2));
-        assertThat(statusResponse.path("data.email"), hasToString("janet.weaver@reqres.in"));
-        assertThat(statusResponse.path("data.first_name"), hasToString("Janet"));
-        assertThat(statusResponse.path("data.last_name"), hasToString("Weaver"));
+        assertAll("Проверка данных в ответе",
+                () -> assertThat(statusResponse.path("data.id"), is(2)),
+                () -> assertThat(statusResponse.path("data.email"), hasToString("janet.weaver@reqres.in")),
+                () -> assertThat(statusResponse.path("data.first_name"), hasToString("Janet")),
+                () -> assertThat(statusResponse.path("data.last_name"), hasToString("Weaver")));
+    }
+
+    @Test
+    void loginSuccessfulWithCorrectValuesAssertj() {
+        String firstBody = "{\"email\": \"eve.holt@reqres.in\", \"password\": \"cityslicka\"}";
+        Response statusResponse = given()
+                .log().uri()
+                .log().method()
+                .log().body()
+                .contentType(JSON)
+                .body(firstBody)
+                .when()
+                .post("/login")
+                .then()
+                .log().status()
+                .log().body()
+                .statusCode(200)
+                .extract().response();
+        assertThat(statusResponse.path("token"), is("QpwL5tke4Pnpja7X4"));
     }
 }
