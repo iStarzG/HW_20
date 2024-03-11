@@ -2,7 +2,9 @@ package tests;
 
 
 import io.qameta.allure.Owner;
+import io.restassured.RestAssured;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
@@ -14,6 +16,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 public class ReqresLoginTest {
+    @BeforeAll
+    static void restAssuredBase() {
+        RestAssured.baseURI = "https://reqres.in";
+        RestAssured.basePath = "/api";
+    }
     @Owner("iStarzG")
     @Tag("Successful")
     @Test
@@ -26,7 +33,7 @@ public class ReqresLoginTest {
                 .contentType(JSON)
                 .body(firstBody)
                 .when()
-                .post("https://reqres.in/api/login")
+                .post("/login")
                 .then()
                 .log().status()
                 .log().body()
@@ -46,7 +53,7 @@ public class ReqresLoginTest {
                 .log().body()
                 .body(firstBody)
                 .when()
-                .post("https://reqres.in/api/login")
+                .post("/login")
                 .then()
                 .log().status()
                 .log().body()
@@ -65,7 +72,7 @@ public class ReqresLoginTest {
                 .log().body()
                 .body(firstBody)
                 .when()
-                .post("https://reqres.in/api/login")
+                .post("/login")
                 .then()
                 .log().status()
                 .log().body()
@@ -85,7 +92,7 @@ public class ReqresLoginTest {
                 .contentType(JSON)
                 .body(firstBody)
                 .when()
-                .post("https://reqres.in/api/login")
+                .post("/login")
                 .then()
                 .log().status()
                 .log().body()
@@ -105,7 +112,7 @@ public class ReqresLoginTest {
                 .log().body()
                 .contentType(JSON)
                 .when()
-                .get("https://reqres.in/api/users/2")
+                .get("/users/2")
                 .then()
                 .log().status()
                 .log().body()
